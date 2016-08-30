@@ -17,7 +17,34 @@ Use and distibution http://www.opensource.org/licenses/bsd-license.php
 2013-02-25 now will push non-inline elements up the stack if nested in an inline element
 2013-02-25 comment element support added, removed by default, see AllowComments in options
 */
-(function ($) {
+// Uses CommonJS, AMD or browser globals to create a jQuery plugin.
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node/CommonJS
+        module.exports = function( root, jQuery ) {
+            if ( jQuery === undefined ) {
+                // require('jQuery') returns a factory that requires window to
+                // build a jQuery instance, we normalize how we use modules
+                // that require this pattern but the window provided is a noop
+                // if it's defined (how jquery works)
+                if ( typeof window !== 'undefined' ) {
+                    jQuery = require('jquery');
+                }
+                else {
+                    jQuery = require('jquery')(root);
+                }
+            }
+            factory(jQuery);
+            return jQuery;
+        };
+    } else {
+        // Browser globals
+        factory(jQuery);
+    }
+}(function ($) {
     $.fn.htmlClean = function (options) {
         // iterate and html clean each matched element
         return this.each(function () {
@@ -581,4 +608,4 @@ Use and distibution http://www.opensource.org/licenses/bsd-license.php
     // white space chars
     var whitespace = [" ", " ", "\t", "\n", "\r", "\f"];
 
-})(jQuery);
+}));
